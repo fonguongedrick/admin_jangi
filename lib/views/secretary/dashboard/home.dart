@@ -5,7 +5,7 @@ import 'package:admin_jangi/views/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_jangi/style.dart';
 import 'package:intl/intl.dart';
-import 'notification.dart';
+//import 'notification.dart';
 import 'package:admin_jangi/views/dashboard/transactions.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -139,395 +139,211 @@ class _RecordTransactionDialogState extends State<RecordTransactionDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
-      child: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  'Record a transaction',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Record a transaction',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 32),
+            Text('Your Name'),
+            SizedBox(height: 5),
+            DropdownButtonFormField<String>(
+              value: selectedUserName,
+              onChanged: (String? newValue) {
+                setState(() {
+                  if (newValue != null) {
+                    selectedUserName = newValue;
+                  }
+                });
+              },
+              items: userNames.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFD9D9D9),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide.none,
                 ),
               ),
-              SizedBox(height: 32),
-              Text('Your Name'),
-              SizedBox(height: 5),
-              DropdownButtonFormField<String>(
-                value: selectedUserName,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    if (newValue != null) {
-                      selectedUserName = newValue;
-                    }
-                  });
-                },
-                items: userNames.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Color(0xFFD9D9D9),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide.none,
-                  ),
+            ),
+            SizedBox(height: 10),
+            Text('Transaction Type'),
+            SizedBox(height: 5),
+            DropdownButtonFormField<String>(
+              value: selectedTransactionType,
+              onChanged: (String? newValue) {
+                setState(() {
+                  if (newValue != null) {
+                    selectedTransactionType = newValue;
+                  }
+                });
+              },
+              items: transactionTypes.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFD9D9D9),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide.none,
                 ),
               ),
+            ),
+            SizedBox(height: 10),
+            Text('Enter Amount'),
+            SizedBox(height: 5),
+            TextField(
+              controller: amountController,
+              decoration: InputDecoration(
+                hintText: '000 XAF',
+                filled: true,
+                fillColor: Color(0xFFD9D9D9),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            if (selectedTransactionType == 'Loan') ...[
               SizedBox(height: 10),
-              Text('Transaction Type'),
+              Text('Start Date'),
               SizedBox(height: 5),
-              DropdownButtonFormField<String>(
-                value: selectedTransactionType,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    if (newValue != null) {
-                      selectedTransactionType = newValue;
-                    }
-                  });
+              GestureDetector(
+                onTap: () {
+                  _selectDate(context, startDateController);
                 },
-                items: transactionTypes.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Color(0xFFD9D9D9),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              Text('Enter Amount'),
-              SizedBox(height: 5),
-              TextField(
-                controller: amountController,
-                decoration: InputDecoration(
-                  hintText: '000 XAF',
-                  filled: true,
-                  fillColor: Color(0xFFD9D9D9),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              if (selectedTransactionType == 'Loan') ...[
-                SizedBox(height: 10),
-                Text('Start Date'),
-                SizedBox(height: 5),
-                GestureDetector(
-                  onTap: () {
-                    _selectDate(context, startDateController);
-                  },
-                  child: AbsorbPointer(
-                    child: TextField(
-                      controller: startDateController,
-                      decoration: InputDecoration(
-                        hintText: 'Pick a date',
-                        filled: true,
-                        fillColor: Color(0xFFD9D9D9),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide.none,
-                        ),
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: startDateController,
+                    decoration: InputDecoration(
+                      hintText: 'Pick a date',
+                      filled: true,
+                      fillColor: Color(0xFFD9D9D9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
-                Text('Due Date'),
-                SizedBox(height: 5),
-                GestureDetector(
-                  onTap: () {
-                    _selectDate(context, endDateController);
-                  },
-                  child: AbsorbPointer(
-                    child: TextField(
-                      controller: endDateController,
-                      decoration: InputDecoration(
-                        hintText: 'Pick a date',
-                        filled: true,
-                        fillColor: Color(0xFFD9D9D9),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide.none,
-                        ),
+              ),
+              SizedBox(height: 10),
+              Text('Due Date'),
+              SizedBox(height: 5),
+              GestureDetector(
+                onTap: () {
+                  _selectDate(context, endDateController);
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: endDateController,
+                    decoration: InputDecoration(
+                      hintText: 'Pick a date',
+                      filled: true,
+                      fillColor: Color(0xFFD9D9D9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
-              ] else if (selectedTransactionType != 'Loan') ...[
-                SizedBox(height: 10),
-                Text('Date'),
-                SizedBox(height: 5),
+              ),
+            ] else if (selectedTransactionType != 'Loan') ...[
+              SizedBox(height: 10),
+              Text('Date'),
+              SizedBox(height: 5),
+              GestureDetector(
+                onTap: () {
+                  _selectDate(context, dateController);
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    controller: dateController,
+                    decoration: InputDecoration(
+                      hintText: 'Pick a date',
+                      filled: true,
+                      fillColor: Color(0xFFD9D9D9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    await _submitTransaction();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 32.0),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ),
                 GestureDetector(
                   onTap: () {
-                    _selectDate(context, dateController);
+                    Navigator.of(context).pop();
                   },
-                  child: AbsorbPointer(
-                    child: TextField(
-                      controller: dateController,
-                      decoration: InputDecoration(
-                        hintText: 'Pick a date',
-                        filled: true,
-                        fillColor: Color(0xFFD9D9D9),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide.none,
-                        ),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 32.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      'Discard',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16.0,
                       ),
                     ),
                   ),
                 ),
               ],
-              SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      await _submitTransaction();
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 32.0),
-                      decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Text(
-                        'Save',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 32.0),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Text(
-                        'Discard',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16.0,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-void showCreateEventDialog(BuildContext context) {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController dateController = TextEditingController();
-  TextEditingController amountController = TextEditingController();
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null) {
-      dateController.text = "${picked.toLocal()}".split(' ')[0];
-    }
-  }
-
-  Future<void> _submitDetails() async {
-    final String name = nameController.text;
-    final String date = dateController.text;
-    final String amount = amountController.text;
-
-    if (name.isEmpty || date.isEmpty || amount.isEmpty) {
-      // Handle the case where some fields are not filled
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill all the fields')),
-      );
-      return;
-    }
-
-    final response = await http.post(
-      Uri.parse('https://814f-102-244-155-214.ngrok-free.app/api/events/create'), // Replace with your server API endpoint
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'name': name,
-        'date': date,
-        'amount': amount,
-      }),
-    );
-     print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    if (response.statusCode == 201) {
-      // If the server returns a 200 OK response, show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Event created successfully!')),
-      );
-      Navigator.of(context).pop(); // Close the dialog
-    } else {
-      // If the server did not return a 200 OK response, show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create event')),
-      );
-    }
-  }
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'Create an event',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(height: 32),
-                Text('Name'),
-                SizedBox(height: 5),
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter event name',
-                    filled: true,
-                    fillColor: Color(0xFFD9D9D9),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text('Event date'),
-                SizedBox(height: 5),
-                GestureDetector(
-                  onTap: () {
-                    _selectDate(context);
-                  },
-                  child: AbsorbPointer(
-                    child: TextField(
-                      controller: dateController,
-                      decoration: InputDecoration(
-                        hintText: 'Pick a date',
-                        filled: true,
-                        fillColor: Color(0xFFD9D9D9),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text('Enter Amount'),
-                SizedBox(height: 5),
-                TextField(
-                  controller: amountController,
-                  decoration: InputDecoration(
-                    hintText: '0.00',
-                    filled: true,
-                    fillColor: Color(0xFFD9D9D9),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        await _submitDetails();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 32.0),
-                        decoration: BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Text(
-                          'Save',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 32.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Text(
-                          'Discard',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    },
-  );
-}
-class HomePage extends StatelessWidget {
+class secretaryHomePage extends StatelessWidget {
   
 
   @override
@@ -705,43 +521,7 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 8,),
-                     GestureDetector(
-                      onTap: (){
-                        showCreateEventDialog(context);
-                      },
-                       child: Container(
-                          height: 165,
-                          width: 170,
-                          decoration: BoxDecoration(
-                              color: Color(0xFF1C2B35),
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                     Text('Jangi Meet', style: TextStyle(color: Colors.white),),
-                                    Icon(Icons.info, color: Colors.white,),
-                                     
-                                  ],
-                                ),
-                               SizedBox(height: 8,),
-                               
-                                Text(
-                                  'Create an Event',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color:Colors.white, fontSize: 27, fontWeight: FontWeight.bold),
-                                ),
-                                Spacer(),
-                                Text('', style: TextStyle(color: Colors.white),),
-                              ],
-                            ),
-                          ),
-                        ),
-                     ),
+                     
                       
                     ],
                   ),

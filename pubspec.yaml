@@ -35,6 +35,9 @@ dependencies:
   permission_handler: ^10.2.0
   open_filex: ^4.0.0
   external_path: ^1.0.3
+  http: any
+  flutter_spinkit: ^5.1.0
+  shared_preferences: ^2.0.9
 
 
   # The following adds the Cupertino Icons font to your application.
